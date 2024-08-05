@@ -1,25 +1,15 @@
-function animation = drone_Animation(xhistory, yreftot, env)
+function animation = drone_Animation(xHistory, env)
 % This Animation code is for QuadCopter. Written by Jitendra Singh 
 
-dronex = xhistory(:,1);
-droney = xhistory(:,2);
-dronez = xhistory(:,3);
-roll = xhistory(:,4);
-pitch = xhistory(:,5);
-yaw = xhistory(:,6);
-dronevarx = xhistory(:,7);
-dronevary = xhistory(:,8);
-dronevarz = xhistory(:,9);
-
-x = yreftot(:,1);
-y = yreftot(:,2);
-z = yreftot(:,3);
-roll = yreftot(:,4);
-pitch = yreftot(:,5);
-yaw = yreftot(:,6);
-varx = gradient(yreftot(:,1));
-vary = gradient(yreftot(:,2));
-varz = gradient(yreftot(:,3));
+x = xHistory(:,1);
+y = xHistory(:,2);
+z = xHistory(:,3);
+roll = xHistory(:,4);
+pitch = xHistory(:,5);
+yaw = xHistory(:,6);
+varx = xHistory(:,7);
+vary = xHistory(:,8);
+varz = xHistory(:,9);
 
 %% Define design parameters
 D2R = pi/180;
@@ -82,16 +72,18 @@ zp = zeros(1,length(to));
 %% create a group object and parent surface
   combinedobject = hgtransform('parent',hg );
   set(drone,'parent',combinedobject)
+%  drawnow
+
+ %plot3(envelope(:,1),envelope(:,2),envelope(:,3), 'y:','Marker','o','MarkerSize', env*30);
 
 function ring_plot = draw_ring(x, y, z, varx, vary, varz, size, teta)
 
-    xx = size*cos(teta) + x;
-    yy = size*sin(teta) + y;
-    zz = 0*teta;
-    pnts = [xx; yy; zz];
-    n0 = [0;0;1];
-    n0 = n0/norm(n0);
-    n1 = [varx; vary; varz]/norm([varx, vary, varz]);
+    x = cos(teta);
+    y = sin(teta);
+    z = 0*teta;
+    pnts = [x, y, z];
+    n0 = pnts/norm(0, 0, 1);
+    n1 = [varx; vary; varz]/norm(varx, vary, varz);
     c = dot(n0,n1) / ( norm(n0)*norm(n1) );
     s = sqrt(1-c*c); 
     u = cross(n0,n1) / ( norm(n0)*norm(n1) );
@@ -103,13 +95,17 @@ function ring_plot = draw_ring(x, y, z, varx, vary, varz, size, teta)
         u(3)*u(1)*C-u(2)*s, u(3)*u(2)*C+u(1)*s, u(3)^2*C+c];
 
     newPnts = R*pnts;
-    newPnts = newPnts + [0;0;z+size/2];
-    plot3(newPnts(1,:), newPnts(2,:), newPnts(3,:), 'b')
+    plot3(newPnts, 'b')
 end
 
+function rotate = rotte_m(x,y,z,teta)
+    rotate = [x,y,z].*[[1, 0, 0]...
+        ,[0, cos(teta), -sin(teta)]...
+        ,[0, sin(teta), cos(teta)]];
+end
 teta = linspace(0, 2*pi, 100);
 
-for i = 1:length(x)-1
+for i = 1:length(x)
     draw_ring(x(i), y(i), z(i), varx(i), vary(i), varz(i), env, teta);
 end
 
@@ -117,9 +113,9 @@ drawnow
 
  for i = 1:length(x)
 
-     plot3(dronex(1:i),droney(1:i),dronez(1:i), 'r-','LineWidth',1);
+     plot3(x(1:i),y(1:i),z(1:i), 'g:','LineWidth',1.5);
      translation = makehgtform('translate',...
-                               [dronex(i) droney(i) dronez(i)]);
+                               [x(i) y(i) z(i)]);
      %set(combinedobject, 'matrix',translation);
      rotation1 = makehgtform('xrotate',(pi/180)*(roll(i)));
      rotation2 = makehgtform('yrotate',(pi/180)*(pitch(i)));
@@ -131,7 +127,5 @@ drawnow
         %delete(b);
      pause(0.001);
  end
-
 drawnow
-
 end

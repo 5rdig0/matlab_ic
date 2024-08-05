@@ -67,7 +67,14 @@ lastMV = mv;
 xHistory = x';
 uHistory = lastMV;
 
-env = 1.1;
+global env
+env = 1;
+%%
+% 
+%   for x = 1:10
+%       disp(x)
+%   end
+% 
 
 % Simulation loop
 ise = 0;
@@ -78,7 +85,7 @@ for k = 1:(Duration/Ts)
     yref = QuadrotorReferenceTrajectory(t);
 
     %Modificações
-    wk = 0.01*randn(1,nx);
+    wk = 0.08*randn(1,nx);
     xk = xHistory(k,:) + wk;
     %Integral do erro quadrático 
     ise = ise + (yref(1,1)-xk(1,1))^2;
@@ -109,6 +116,6 @@ close(hbar);
 plotQuadrotorTrajectory;
 
 %%
-env = 1.5;
-
-drone_Animation(xHistory, env);
+pause(2)
+trajectory = yreftot(:,1:3);
+drone_Animation(xHistory, yreftot, env);
