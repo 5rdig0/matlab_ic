@@ -6,38 +6,56 @@
 % Plot the closed-loop response.
 time = 0:Ts:Duration;
 yreftot = QuadrotorReferenceTrajectory(time)';
-
+global env;
 % Plot the states.
+
+%Modificaçoes
+
+%Tamanho do envelope
+envelopex_sup = yreftot(:,1) + env;
+envelopex_inf = yreftot(:,1) - env;
+envelopey_sup = yreftot(:,2) + env;
+envelopey_inf = yreftot(:,2) - env;
+envelopez_sup = yreftot(:,3) + env;
+envelopez_inf = yreftot(:,3) - env;
+envelopexyz = [envelopex_sup, envelopex_inf, envelopey_sup, envelopey_inf, envelopez_sup, envelopez_inf];
+
 figure('Name','States')
 
 subplot(2,3,1)
 hold on
 plot(time,xHistory(:,1))
+plot(time,yreftot(:,1) + env)
+plot(time,yreftot(:,1) - env)
 plot(time,yreftot(:,1))
 grid on
 xlabel('time')
 ylabel('x')
-legend('actual','reference','Location','southeast')
+legend('actual', 'envelope superior', 'envelope inferior ','reference','Location','southeast')
 title('Quadrotor x position')
 
 subplot(2,3,2)
 hold on
 plot(time,xHistory(:,2))
+plot(time,yreftot(:,2) + env)
+plot(time,yreftot(:,2) - env)
 plot(time,yreftot(:,2))
 grid on
 xlabel('time')
 ylabel('y')
-legend('actual','reference','Location','southeast')
+legend('actual',  'envelope superior', 'envelope inferior ','reference','Location','southeast')
 title('Quadrotor y position')
 
 subplot(2,3,3)
 hold on
 plot(time,xHistory(:,3))
+plot(time,yreftot(:,3) + env)
+plot(time,yreftot(:,3) - env)
 plot(time,yreftot(:,3))
 grid on
 xlabel('time')
 ylabel('z')
-legend('actual','reference','Location','southeast')
+legend('actual',  'envelope superior', 'envelope inferior ','reference','Location','southeast')
 title('Quadrotor z position')
 
 subplot(2,3,4)

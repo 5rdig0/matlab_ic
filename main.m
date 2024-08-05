@@ -47,7 +47,7 @@ nlmpcobj.Weights.ManipulatedVariables = [0.1 0.1 0.1 0.1];
 % Also, penalize overly aggressive control actions by specifying tuning weights for the MV rates of change.
 nlmpcobj.Weights.ManipulatedVariablesRate = [0.1 0.1 0.1 0.1];
 % Specify the initial conditions
-x = [7;-10;0;0;0;0;0;0;0;0;0;0];
+x = [0;0;0.2;0;0;0;0;0;0;0;0;0];
 
 % Nominal control target (average to keep quadrotor floating)
 nloptions = nlmpcmoveopt;
@@ -67,6 +67,8 @@ lastMV = mv;
 xHistory = x';
 uHistory = lastMV;
 
+env = 1.1;
+
 % Simulation loop
 ise = 0;
 for k = 1:(Duration/Ts)
@@ -75,10 +77,8 @@ for k = 1:(Duration/Ts)
     t = linspace(k*Ts, (k+p-1)*Ts,p);
     yref = QuadrotorReferenceTrajectory(t);
 
-    % Compute control move with reference previewing
-    
     %Modificações
-    wk = 0.1*randn(1,nx);
+    wk = 0.01*randn(1,nx);
     xk = xHistory(k,:) + wk;
     %Integral do erro quadrático 
     ise = ise + (yref(1,1)-xk(1,1))^2;
@@ -86,6 +86,7 @@ for k = 1:(Duration/Ts)
     %fk = wk + xHistory(k,:);
     %disp(size(fk));
 
+    % Compute control move with reference previewing
     [uk,nloptions,info] = nlmpcmove(nlmpcobj,xk,lastMV,yref',[],nloptions);
 
     % Store control move
@@ -103,9 +104,11 @@ for k = 1:(Duration/Ts)
     waitbar(k*Ts/Duration,hbar);
 end
 
-% Close waitbar 
+%% Close waitbar 
 close(hbar);
-
 plotQuadrotorTrajectory;
 
-animateQuadrotorTrajectory;
+%%
+env = 1.5;
+
+drone_Animation(xHistory, env);
