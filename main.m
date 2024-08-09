@@ -85,7 +85,7 @@ for k = 1:(Duration/Ts)
     yref = QuadrotorReferenceTrajectory(t);
 
     %Modificações
-    wk = 0.08*randn(1,nx);
+    wk = 0.05*randn(1,nx);
     xk = xHistory(k,:) + wk;
     %Integral do erro quadrático 
     ise = ise + (yref(1,1)-xk(1,1))^2;
@@ -111,11 +111,11 @@ for k = 1:(Duration/Ts)
     waitbar(k*Ts/Duration,hbar);
 end
 
-%% Close waitbar 
 close(hbar);
+%%
 plotQuadrotorTrajectory;
+pause(2)
 
 %%
-pause(2)
 trajectory = yreftot(:,1:3);
 drone_Animation(xHistory, yreftot, env);

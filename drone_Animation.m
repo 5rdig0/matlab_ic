@@ -49,7 +49,7 @@ zp = zeros(1,length(to));
  view(68,53);
  grid on;
  axis equal;
- xlim([-env*13 env*13]); ylim([-env*11 env*13]); zlim([env*0 env*9]);
+ xlim([-env*20 env*20]); ylim([-env*20 env*20]); zlim([-env*10 env*10]);
  title('CyRos Drone Animation')
  xlabel('X[m]');
  ylabel('Y[m]');
@@ -83,28 +83,31 @@ zp = zeros(1,length(to));
   combinedobject = hgtransform('parent',hg );
   set(drone,'parent',combinedobject)
 
-function ring_plot = draw_ring(x, y, z, varx, vary, varz, size, teta)
+    function draw_ring(x, y, z, varx, vary, varz, size, teta)
 
-    xx = size*cos(teta) + x;
-    yy = size*sin(teta) + y;
+    xx = size*sin(teta);
+    yy = size*cos(teta);
     zz = 0*teta;
     pnts = [xx; yy; zz];
     n0 = [0;0;1];
     n0 = n0/norm(n0);
-    n1 = [varx; vary; varz]/norm([varx, vary, varz]);
+    var = [varx;vary;varz];
+    n1 = var/norm(var);
     c = dot(n0,n1) / ( norm(n0)*norm(n1) );
+    disp(c);
     s = sqrt(1-c*c); 
     u = cross(n0,n1) / ( norm(n0)*norm(n1) );
+    disp(u);
     u = u/norm(u); 
     C = 1-c;
 
     R = [u(1)^2*C+c, u(1)*u(2)*C-u(3)*s, u(1)*u(3)*C+u(2)*s
-        u(2)*u(1)*C+u(3)*s, u(2)^2*C+c, u(2)*u(3)*C-u(1)*s
-        u(3)*u(1)*C-u(2)*s, u(3)*u(2)*C+u(1)*s, u(3)^2*C+c];
+         u(2)*u(1)*C+u(3)*s, u(2)^2*C+c, u(2)*u(3)*C-u(1)*s
+         u(3)*u(1)*C-u(2)*s, u(3)*u(2)*C+u(1)*s, u(3)^2*C+c];
 
-    newPnts = R*pnts;
-    newPnts = newPnts + [0;0;z+size/2];
-    plot3(newPnts(1,:), newPnts(2,:), newPnts(3,:), 'b')
+    pnts = R*pnts;
+    pnts = pnts + [x;y;z];
+    plot3(pnts(1,:), pnts(2,:), pnts(3,:), 'b')
 end
 
 teta = linspace(0, 2*pi, 100);
@@ -112,12 +115,13 @@ teta = linspace(0, 2*pi, 100);
 for i = 1:length(x)-1
     draw_ring(x(i), y(i), z(i), varx(i), vary(i), varz(i), env, teta);
 end
-
+%plot3(x,y,z, 'g-','LineWidth',1);
 drawnow
 
  for i = 1:length(x)
 
      plot3(dronex(1:i),droney(1:i),dronez(1:i), 'r-','LineWidth',1);
+     %disp([varx(i),vary(i),varz(i)]);
      translation = makehgtform('translate',...
                                [dronex(i) droney(i) dronez(i)]);
      %set(combinedobject, 'matrix',translation);
