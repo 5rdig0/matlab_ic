@@ -1,6 +1,7 @@
 close all;
 clear all;
 
+ise = 0;
 % Create a nonlinear MPC object with 12 states, 12 outputs, and 4 inputs. 
 % By default, all the inputs are manipulated variables (MVs).
 nx = 12;
@@ -58,34 +59,30 @@ mv = nloptions.MVTarget;
 Duration = 20;
 
 % Display waitbar to show simulation progress
-hbar = waitbar(0,"Simulation Progress");
-
+hbar = waitbar(0, "Simulation Progress");
 % MV last value is part of the controller state
 lastMV = mv;
 
 % Store states for plotting purposes
 xHistory = x';
 uHistory = lastMV;
-
 global env
-env = 1;
-%%
-% 
+env = 0.75;
 %   for x = 1:10
 %       disp(x)
 %   end
-% 
-
 % Simulation loop
-ise = 0;
-for k = 1:(Duration/Ts)
 
+for k = 1:(Duration/Ts)
     % Set references for previewing
     t = linspace(k*Ts, (k+p-1)*Ts,p);
+
     yref = QuadrotorReferenceTrajectory(t);
 
     %Modificações
-    wk = 0.05*randn(1,nx);
+    %wk = i*randn(1,nx);
+    wk = zeros(1,12);
+    wk(1) = 0.0*randn(1);
     xk = xHistory(k,:) + wk;
     %Integral do erro quadrático 
     ise = ise + (yref(1,1)-xk(1,1))^2;
@@ -110,12 +107,10 @@ for k = 1:(Duration/Ts)
     % Update waitbar
     waitbar(k*Ts/Duration,hbar);
 end
-
 close(hbar);
-%%
-plotQuadrotorTrajectory;
-pause(2)
 
-%%
+plotQuadrotorTrajectory;
+pause(3)
+
 trajectory = yreftot(:,1:3);
 drone_Animation(xHistory, yreftot, env);

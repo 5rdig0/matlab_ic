@@ -49,8 +49,8 @@ zp = zeros(1,length(to));
  view(68,53);
  grid on;
  axis equal;
- xlim([-env*20 env*20]); ylim([-env*20 env*20]); zlim([-env*10 env*10]);
- title('CyRos Drone Animation')
+ xlim([-env*13 env*13]); ylim([-env*13 env*13]); zlim([-env env*9]);
+ title('Animação da trajetória')
  xlabel('X[m]');
  ylabel('Y[m]');
  zlabel('Z[m]');
@@ -83,8 +83,7 @@ zp = zeros(1,length(to));
   combinedobject = hgtransform('parent',hg );
   set(drone,'parent',combinedobject)
 
-    function draw_ring(x, y, z, varx, vary, varz, size, teta)
-
+  function draw_ring(x, y, z, varx, vary, varz, size, teta)
     xx = size*sin(teta);
     yy = size*cos(teta);
     zz = 0*teta;
@@ -94,10 +93,8 @@ zp = zeros(1,length(to));
     var = [varx;vary;varz];
     n1 = var/norm(var);
     c = dot(n0,n1) / ( norm(n0)*norm(n1) );
-    disp(c);
     s = sqrt(1-c*c); 
     u = cross(n0,n1) / ( norm(n0)*norm(n1) );
-    disp(u);
     u = u/norm(u); 
     C = 1-c;
 
@@ -107,7 +104,7 @@ zp = zeros(1,length(to));
 
     pnts = R*pnts;
     pnts = pnts + [x;y;z];
-    plot3(pnts(1,:), pnts(2,:), pnts(3,:), 'b')
+    plot3(pnts(1,:), pnts(2,:), pnts(3,:), 'y')
 end
 
 teta = linspace(0, 2*pi, 100);
@@ -121,6 +118,7 @@ drawnow
  for i = 1:length(x)
 
      plot3(dronex(1:i),droney(1:i),dronez(1:i), 'r-','LineWidth',1);
+     plot3(x(1:i),y(1:i),z(1:i), 'g-','LineWidth',1);
      %disp([varx(i),vary(i),varz(i)]);
      translation = makehgtform('translate',...
                                [dronex(i) droney(i) dronez(i)]);
